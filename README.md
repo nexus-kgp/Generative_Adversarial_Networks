@@ -14,6 +14,6 @@ Results :
 * After some hundred thousands iterations : [After some hundred thousands iterations](./out-pytorch-gan/102.png)
 
 
-Generator's Loss : [gen-loss](././out-pytorch-gan/disloss.png)
+**Generator's Loss** : ![gen-loss](././out-pytorch-gan/disloss.png)
 
-Discriminator's Loss : [disc-loss](././out-pytorch-gan/genloss.png)
+**Discriminator's Loss** : ![disc-loss](././out-pytorch-gan/genloss.png)
