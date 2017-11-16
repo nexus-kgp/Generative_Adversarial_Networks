@@ -8,10 +8,10 @@ The branch `plain_pytorch_implementation` contains the PyTorch implementation of
 
 
 Results : 
-* Before start of training : [Before start of training](./out-pytorch-gan/000.png)
-* After one iteration : [After one iteration](./out-pytorch-gan/001.png)
-* After two iterations : [After two iteration](./out-pytorch-gan/002.png)
-* After some hundred thousands iterations : [After some hundred thousands iterations](./out-pytorch-gan/102.png)
+* **Before start of training** : ![Before start of training](./out-pytorch-gan/000.png)
+* **After one iteration** : ![After one iteration](./out-pytorch-gan/001.png)
+* **After two iterations** : ![After two iteration](./out-pytorch-gan/002.png)
+* **After some hundred thousands iterations** : ![After some hundred thousands iterations](./out-pytorch-gan/102.png)
 
 
 **Generator's Loss** : ![gen-loss](././out-pytorch-gan/disloss.png)
