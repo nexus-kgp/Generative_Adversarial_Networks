@@ -35,3 +35,56 @@ parser.add_argument('--manualSeed', type=int, help='manual seed')
 
 opt = parser.parse_args()
 print(opt)
+try:
+    os.makedirs(opt.outf)
+except OSError:
+    pass
+
+if opt.manualSeed is None:
+    opt.manualSeed = random.randint(1, 10000)
+print("Random Seed: ", opt.manualSeed)
+random.seed(opt.manualSeed)
+torch.manual_seed(opt.manualSeed)
+if opt.cuda:
+    torch.cuda.manual_seed_all(opt.manualSeed)
+
+cudnn.benchmark = True
+
+if torch.cuda.is_available() and not opt.cuda:
+    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+
+if opt.dataset in ['imagenet', 'folder', 'lfw']:
+    # folder dataset
+    dataset = dset.ImageFolder(root=opt.dataroot,
+                               transform=transforms.Compose([
+                                   transforms.Resize(opt.imageSize),
+                                   transforms.CenterCrop(opt.imageSize),
+                                   transforms.ToTensor(),
+                                   transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                               ]))
+elif opt.dataset == 'lsun':
+    dataset = dset.LSUN(db_path=opt.dataroot, classes=['bedroom_train'],
+                        transform=transforms.Compose([
+                            transforms.Resize(opt.imageSize),
+                            transforms.CenterCrop(opt.imageSize),
+                            transforms.ToTensor(),
+                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                        ]))
+elif opt.dataset == 'cifar10':
+    dataset = dset.CIFAR10(root=opt.dataroot, download=True,
+                           transform=transforms.Compose([
+                               transforms.Resize(opt.imageSize),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                           ]))
+
+assert dataset
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
+                                         shuffle=True, num_workers=int(opt.workers))
+
+ngpu = int(opt.ngpu)
+nz = int(opt.nz)
+ngf = int(opt.ngf)
+ndf = int(opt.ndf)
+nc = 3
+
