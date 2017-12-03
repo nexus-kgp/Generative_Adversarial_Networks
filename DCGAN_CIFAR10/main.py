@@ -139,7 +139,6 @@ def _deprocess_and_save(batch_res, epoch, grid_shape=(8, 8), grid_pad=5):
 def train_dcgan(n_epochs, batch_size, lr_rate, crop_len, scale_len, restore, paths):
     """
         Train DCGAN.
-
         :param int n_epochs:
             Total number of epochs over the input data to train for.
 
