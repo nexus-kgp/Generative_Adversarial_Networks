@@ -269,3 +269,36 @@ def dcgan(side_len):
     # save the result
     _deprocess_and_save(result, -1)
 
+
+
+
+def main(args):
+    """
+        Entry point.
+    """
+
+    global OUTPUT_PATH
+
+    # should probably be passing this to `train_dcgan()` instead
+    if args.output_dir:
+        OUTPUT_PATH = args.output_dir
+
+    # if a training directory is specified, begin training
+    if args.train_dir:
+
+        # naively read in data for now
+        # TODO: use TF reader ops to do this
+        pathname = os.path.join(args.train_dir, "*")
+        paths = [path for path in glob.glob(pathname)]
+
+        train_dcgan(args.num_epochs, args.batch_size, args.learning_rate, 
+                    args.image_size, args.scale_size, args.restore, paths)
+
+    # otherwise, use the generator to create images
+    else:
+        sample_dcgan(args.image_size)
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args)
