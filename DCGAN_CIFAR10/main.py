@@ -52,6 +52,16 @@ def _clean_directory(path):
 
 
 
+def _sigmoid_loss(logits, targets):
+    """
+        Wrapper around Tensorflow's sigmoid loss function.
+    """
+
+    loss_comp = tf.nn.sigmoid_cross_entropy_with_logits(logits, targets)
+
+    return tf.reduce_mean(loss_comp)
+    
+
 
 
 def _read_and_preprocess(paths, scale_len, crop_len):
@@ -124,3 +134,110 @@ def _deprocess_and_save(batch_res, epoch, grid_shape=(8, 8), grid_pad=5):
     # save the output image
     fname = "epoch{0}.jpg".format(epoch) if epoch >= 0 else "result.jpg"
     imsave(os.path.join(OUTPUT_PATH, fname), img_grid)
+
+
+def train_dcgan(n_epochs, batch_size, lr_rate, crop_len, scale_len, restore, paths):
+    """
+        Train DCGAN.
+
+        :param int n_epochs:
+            Total number of epochs over the input data to train for.
+
+        :param int batch_size:
+            Batch size to use for training.
+
+        :param float lr_rate:
+            Generator learning rate.
+
+        :param int crop_len:
+            Image side length to use.
+
+        :param int scale_len:
+            Amount to scale the minimum side length to (for augmentation).
+
+        :param bool restore:
+            Specifies whether or not the latest checkpoint should be used.
+
+        :param list paths:
+            List of paths to images to use for training.
+    """
+
+    assert scale_len >= crop_len, "invalid resize or crop length"
+
+    # create placeholders
+    sample = tf.placeholder(tf.float32, shape=[batch_size, Z_SIZE], name="sample")
+    real = tf.placeholder(tf.float32, shape=[batch_size, 64, 64, 3], name="real")
+    is_train = tf.placeholder(tf.bool, name="is_train")
+
+    # instantiate the models
+    G = generator(sample, is_train, crop_len)
+    D_fake = discriminator(G, is_train)
+    tf.get_variable_scope().reuse_variables()
+    D_real = discriminator(real, is_train)
+
+    # create losses
+    loss_G = _sigmoid_loss(D_fake, tf.ones_like(D_fake))
+    loss_D = _sigmoid_loss(D_fake, tf.zeros_like(D_fake)) + \
+            _sigmoid_loss(D_real, tf.ones_like(D_real))
+
+    # acquire tensors for generator and discriminator
+    # trick from carpedm20's implementation on github
+    g_vars = [var for var in tf.trainable_variables() if "g_" in var.name]
+    d_vars = [var for var in tf.trainable_variables() if "d_" in var.name]
+
+    # create optimization objectives
+    global_step = tf.Variable(0, name="global_step", trainable=False)
+    opt_G = tf.train.AdamOptimizer(lr_rate, beta1=0.5).minimize(loss_G, var_list=g_vars)
+    opt_D = tf.train.AdamOptimizer(2e-4, beta1=0.5).minimize(loss_D, var_list=d_vars)
+
+    # create a saver and restore variables, if necessary
+    saver = tf.train.Saver()
+    model_path = os.path.join(OUTPUT_PATH, CHECKPOINT_NAME)
+
+    # do some initialization
+    sess = tf.Session()
+    sess.run(tf.initialize_all_variables())
+    if restore:
+        chkpt_fname = tf.train.latest_checkpoint(OUTPUT_PATH)
+        saver.restore(sess, chkpt_fname)
+    else:
+        _clean_directory(OUTPUT_PATH)
+        _clean_directory(OUTPUT_PATH)
+
+    # reference vector (to examine epoch-to-epoch changes)
+    vec_ref = np.random.normal(size=(batch_size, Z_SIZE))
+
+    # begin training
+    n_iterations = len(paths) // batch_size
+    for epoch in range(sess.run(global_step), n_epochs):
+        print("------- EPOCH {0} -------".format(epoch))
+        random.shuffle(paths)
+
+        # train the discriminator for one epoch
+        for i in range(n_iterations):
+
+            offset = (i * batch_size) % len(paths)
+            batch_paths = paths[offset:(offset + batch_size)]
+            imgs = _read_and_preprocess(batch_paths, scale_len, crop_len)
+            vec = np.random.normal(size=(batch_size, Z_SIZE))
+
+            # minimize generator loss
+            if i % TRAIN_RATIO == TRAIN_RATIO - 1:
+                sess.run(opt_G, feed_dict={sample: vec, is_train: True})
+
+            # minimize discriminator loss
+            sess.run(opt_D, feed_dict={real: imgs, sample: vec, is_train: True})
+
+            # log the error
+            if i % DISPLAY_LOSSES == 0:
+                err_G = sess.run(loss_G, feed_dict={sample: vec, is_train: False})
+                err_D = sess.run(loss_D, feed_dict={real: imgs, sample: vec, is_train: False})
+                print("  Iteration {0}".format(i))
+                print("    generator loss = {0}".format(err_G))
+                print("    discriminator loss = {0}".format(err_D))
+
+        # save the model and sample results at the end of each epoch
+        sess.run(tf.assign(global_step, epoch + 1))
+        saver.save(sess, model_path, global_step=global_step)
+        batch_res = sess.run(G, {sample: vec_ref, is_train: False})
+        _deprocess_and_save(batch_res, epoch)
