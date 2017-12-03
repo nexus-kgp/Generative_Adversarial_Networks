@@ -154,3 +154,37 @@ def generator(data, is_train, side_length):
 
     return top
 
+
+def discriminator(data, is_train):
+    """
+        Builds the discriminator network.
+
+        :param tensorflow.Tensor data:
+            A 4-D tensor representing an input image.
+
+        :param tensorflow.Tensor is_train:
+            Determines whether or not the discriminator is used only for inference.
+    """
+
+    # conv1 block, 128 outputs
+    conv1 = tf.nn.relu(conv2d("d_conv1", data, [5, 5, 3, 128], STRIDE_2, with_bn=False))
+
+    # conv2 block, 256 outputs
+    conv2 = tf.nn.relu(conv2d("d_conv2", conv1, [5, 5, 128, 256], STRIDE_2, is_train=is_train))
+
+    # conv3 block, 512 outputs
+    conv3 = tf.nn.relu(conv2d("d_conv3", conv2, [5, 5, 256, 512], STRIDE_2, is_train=is_train))
+
+    # conv4 block, 1024 outputs
+    conv4 = tf.nn.relu(conv2d("d_conv4", conv3, [5, 5, 512, 1024], STRIDE_2, is_train=is_train))
+
+    # average pooling
+    avg_pool = tf.reduce_mean(conv4, [1, 2])
+
+    # fully connected
+    classifier = linear("d_classifier", avg_pool, [1024, 1], with_bn=False)
+
+    top = classifier
+
+    return top
+
