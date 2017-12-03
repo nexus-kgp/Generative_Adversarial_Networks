@@ -240,3 +240,32 @@ def train_dcgan(n_epochs, batch_size, lr_rate, crop_len, scale_len, restore, pat
         saver.save(sess, model_path, global_step=global_step)
         batch_res = sess.run(G, {sample: vec_ref, is_train: False})
         _deprocess_and_save(batch_res, epoch)
+
+
+
+def dcgan(side_len):
+    """
+        Runs inference on the generator.
+
+        :param int side_len:
+            Side length for generator output (must match `crop_len`).
+    """
+
+    # only need to restore the generator's variables
+    G = generator(sample, None, side_len)
+
+    sess = tf.Session()
+    sess.run(tf.initialize_all_variables())
+
+    # apply the trained generator weights
+    saver = tf.train.Saver()
+    chkpt_fname = tf.train.latest_checkpoint(OUTPUT_PATH)
+    saver.restore(sess, chkpt_fname)
+
+    # run a forward pass
+    vec = np.random.normal(size=(batch_size, Z_SIZE))
+    result = sess.run(G, {sample: vec})
+
+    # save the result
+    _deprocess_and_save(result, -1)
+
