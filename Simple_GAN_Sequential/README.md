@@ -22,6 +22,27 @@ Discriminator Model:
   )
 )`
 
+## Usage (to run python file)
+```
+usage: simpleGAN.py [-h] [--dataroot DATAROOT] [--batchSize BATCHSIZE]
+                    [--imageSize IMAGESIZE] [--nz NZ] [--nepoch NEPOCH]
+                    [--lr LR] [--netG NETG] [--netD NETD] [--outf OUTF]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --dataroot DATAROOT   path to dataset
+  --batchSize BATCHSIZE
+                        input batch size
+  --imageSize IMAGESIZE
+                        the height / width of the input image to network
+  --nz NZ               size of the latent z vector
+  --nepoch NEPOCH       number of epochs to train for
+  --lr LR               learning rate, default=0.001
+  --netG NETG           path to netG (to continue training)
+  --netD NETD           path to netD (to continue training)
+  --outf OUTF           folder to output images and model checkpoints
+```
+
 Results : 
 * **Before start of training** : 
 
@@ -39,4 +60,4 @@ Results :
 
 **Generator's Loss** : ![gen-loss](./out-pytorch-gan/gen_loss.png)
 
-**Discriminator's Loss** : ![disc-loss](./out-pytorch-gan/dis_loss.png)
+**Discriminator's Loss** : ![dis-loss](./out-pytorch-gan/dis_loss.png)
