@@ -7,12 +7,6 @@ with the samples from the generative model.
 
 After every epoch, models are saved to: `netG_epoch_%d.pth` and `netD_epoch_%d.pth`
 
-## Downloading the dataset
-You can download the LSUN dataset by cloning [this repo](https://github.com/fyu/lsun) and running
-```
-python download.py -c bedroom
-```
-
 ## Usage
 ```
 usage: main.py [-h] --dataset DATASET --dataroot DATAROOT [--workers WORKERS]
@@ -41,3 +35,56 @@ optional arguments:
   --netG NETG           path to netG (to continue training)
   --netD NETD           path to netD (to continue training)
 ```
+
+Training DCGAN
+----------------
+### CIFAR-10
+To train CIFAR-10 on GPU,
+
+    $ python main.py --dataset cifar10 --dataroot cifar-10-batches-py --cuda
+
+To train CIFAR-10 on CPU,
+
+    $ python main.py --dataset cifar10 --dataroot cifar-10-batches-py
+
+Results
+=============
+### CIFAR-10
+* Epoch 0 vs Epoch 5
+
+<table align='center'>
+<tr align='center'>
+<td> At 0 epochs</td>
+<td> After 5 epochs</td>
+</tr>
+<tr>
+<td><img src = 'fake_samples_epoch_000.png'>
+<td><img src = 'fake_samples_epoch_005.png'>
+</tr>
+</table>
+
+* Epoch 10 vs Epoch 20
+
+<table align='center'>
+<tr align='center'>
+<td> After 10 epochs</td>
+<td> After 20 epochs</td>
+</tr>
+<tr>
+<td><img src = 'fake_samples_epoch_010.png'>
+<td><img src = 'fake_samples_epoch_020.png'>
+</tr>
+</table>
+
+* Real vs Generated images
+
+<table align='center'>
+<tr align='center'>
+<td> Real Sample </td>
+<td> Fake at 25 epochs </td>
+</tr>
+<tr>
+<td><img src = 'real_samples.png'>
+<td><img src = 'fake_samples_epoch_024.png'>
+</tr>
+</table>
