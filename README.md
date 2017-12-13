@@ -25,3 +25,8 @@ Results :
 **Generator's Loss** : ![gen-loss](././out-pytorch-gan/disloss.png)
 
 **Discriminator's Loss** : ![disc-loss](././out-pytorch-gan/genloss.png)
+
+
+### Well here are some results from the Deep Convolutional GAN on CIFAR-10 dataset
+
+![GIF of epochs](./DCGAN_Results/dcgan_cifar10.gif)
