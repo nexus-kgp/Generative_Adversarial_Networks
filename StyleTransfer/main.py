@@ -1,7 +1,7 @@
 import argparse
 import os
 from cycleGAN import CycleGAN
-from data_loader import get_loader
+from utils import get_loader
 
 
 def main(config):
@@ -27,9 +27,6 @@ if __name__ == '__main__':
     parser.add_argument('--image_size', type=int, default=32)
     parser.add_argument('--g_conv_dim', type=int, default=64)
     parser.add_argument('--d_conv_dim', type=int, default=64)
-    #parser.add_argument('--use_reconst_loss', required=True, type=str2bool) True
-    #parser.add_argument('--use_labels', required=True, type=str2bool) False
-    parser.add_argument('--num_classes', type=int, default=10)
     
     # training hyper-parameters
     parser.add_argument('--train_iters', type=int, default=40000)
@@ -40,6 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta2', type=float, default=0.999)
     
     # misc
+    parser.add_argument('--cuda', action='store_true', help='enables cuda')
     parser.add_argument('--mode', type=str, default='train')
     parser.add_argument('--model_path', type=str, default='./models')
     parser.add_argument('--sample_path', type=str, default='./samples')

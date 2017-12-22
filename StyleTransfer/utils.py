@@ -39,12 +39,22 @@ def merge_images(sources, targets, batch_size=64):
       return merged.transpose(1, 2, 0)
 
 def deconv_layer(c_in, c_out, k_size, stride=2, pad=1, batch_norm=True):
-  #TODO
-  pass
+  layers = []
+  layers.append(nn.ConvTranspose2d(c_in, c_out, k_size, stride, pad, bias=False))
+  
+  if batch_norm:
+    layers.append(nn.BatchNorm2d(c_out))
+  
+  return nn.Sequential(*layers)
 
 def conv_layer(c_in, c_out, k_size, stride=2, pad=1, batch_norm=True):
-  #TODO
-  pass
+  layers = []
+  layers.append(nn.Conv2d(c_in, c_out, k_size, stride, pad, bias=False))
+
+  if batch_norm:
+    layers.append(nn.BatchNorm2d(c_out))
+
+  return nn.Sequential(*layers)
 
 def residual_layer(x, c_in, c_out, k_size, stride=2, pad=1, batch_norm=True):
   #TODO
