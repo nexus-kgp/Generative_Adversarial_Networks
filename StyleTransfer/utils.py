@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import datasets
@@ -27,7 +28,7 @@ def get_loader(config):
 
 def merge_images(sources, targets, batch_size=64):
       _, _, h, w = sources.shape
-      row = int(np.sqrt(k))
+      row = int(np.sqrt(batch_size))
       merged = np.zeros([3, row*h, row*w*2])
 
       for idx, (s, t) in enumerate(zip(sources, targets)):
